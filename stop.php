@@ -13,8 +13,8 @@ $password = "digo_secret";
 $dbname = "digo_parts_db";
 
 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-$stmt = $conn->prepare('Update system_status set orderid=:lstr where placeholder=0');
-$stmt->execute(['lstr' => $lString]);
+$stmt = $conn->prepare('Update system_status set orderid=0 where placeholder=0');
+$stmt->execute();
 
    
 header('Location: index.php');

@@ -27,12 +27,8 @@ if ($conn->connect_error) {
                     echo "Goedemiddag";
                 } else
                 /* Should the time be between or equal to 1700 and 1900 hours, show good evening */
-                if ($time >= "17" && $time < "19") {
+                if ($time >= "17") {
                     echo "Goedenavond";
-                } else
-                /* Finally, show good night if the time is greater than or equal to 1900 hours */
-                if ($time >= "19") {
-                    echo "Goedenacht";
                 }
                 ?>
             </h3>
@@ -65,6 +61,9 @@ if ($conn->connect_error) {
             </script>
             <?php
             $orderSet = isset($_GET['orderId']) && !empty($_GET['orderId']);
+            if (!$orderSet) {
+                echo "Scan een werkorder of een pakbon om te beginnen.</br></br>";
+            }
             if (1) {
                 $orderId = $_GET['orderId'];
                 $sql = "SELECT * FROM part_allocation where sorted = 0";
