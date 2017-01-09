@@ -91,7 +91,7 @@ if ($conn->connect_error) {
                         <th>aantal</th>
                         <th>klaar</th>
                         <th>label</th>
-                        <th>afwezig</th>
+                        <!--<th>afwezig</th>-->
                     </tr>
                     <?php
                     // output data of each row
@@ -106,7 +106,7 @@ if ($conn->connect_error) {
                         </form>
                         <td style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint(<?php echo $row['werkorder']; ?>)" class="btn btn-xs"><img width=24px height=24px alt="sticker printen" src='includes/images/print.png'/></button></td>
                         </form>
-                            <td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>
+                            <!--<td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>-->
                         </tr>
                     <?php endwhile;
                     ?>
@@ -171,7 +171,6 @@ echo "var curOrder = " . $jsid . ";"
             });
         });
                     
-        alert(found);
         if (!found) {
             $('.message').html("De ingescande order is niet gevonden.");
         } else {
