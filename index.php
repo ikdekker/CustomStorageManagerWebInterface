@@ -273,7 +273,7 @@ echo "var curOrder = " . $jsid . ";"
         if (!found) {
             $('.message').html("De ingescande order is niet gevonden.").show();
         } else {
-            $('.message').html("").show();
+            $('.message').html("").hide();
         }
     }
 </script>
