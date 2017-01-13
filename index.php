@@ -193,7 +193,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                             <td class="col-sm-1" id = "product-amount"><?php echo $row['amount']; ?></td>
                             <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="clear" class="btn btn-xs"><img width=36px height=36px alt="weggelegd" src='includes/images/check.png'/></button></td>
                         </form>
-                        <td class="col-sm-1" style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint(<?php echo $row['werkorder'] . "," . $row['product_id']; ?>)" class="btn btn-xs"><img width=36px height=36px alt="sticker printen" src='includes/images/print.png'/></button></td>
+                        <td class="col-sm-1" style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint('<?php echo $row['werkorder'] . "','" . $row['product_id']; ?>')" class="btn btn-xs"><img width=36px height=36px alt="sticker printen" src='includes/images/print.png'/></button></td>
                             <!--<td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>-->
                         </tr>
                     <?php endwhile;
