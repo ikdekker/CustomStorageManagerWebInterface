@@ -109,10 +109,10 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
             ?>
             <div class="confirm-dialog">
                 <div class="dialog-container">
-                    <p>Voor alle producten is een label uitgeprint. Wilt u de geassocieerde bak loskoppelen van de order?</p>
+                    <p>Bak behouden</p>
                     <ul>
-                        <li><a href="#1" onclick="alterIndex()">Ja</a></li>
-                        <li><a href="#0" onclick="javacript:$('.confirm-overlay').hide()">Nee</a></li>
+                        <li><a href="#1" onclick="alterIndex()">Nee</a></li>
+                        <li><a href="#0" onclick="javacript:$('.confirm-overlay').hide()">Ja</a></li>
                     </ul>
                 </div> <!-- cd-popup-container -->
             </div> <!-- cd-popup -->
@@ -170,7 +170,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                 }
             }
 
-            if (1 && $result->num_rows > 0) :
+            if ($orderId && $result->num_rows > 0) :
                 ?>
                 <table class = "table" id="order-table">
                     <tr>
