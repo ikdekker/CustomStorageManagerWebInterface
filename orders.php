@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 FROM part_allocation parts, order_info info
 WHERE parts.werkorder = info.werkorder
 GROUP BY parts.werkorder
-HAVING MAX(parts.sorted) = 0 AND MIN(parts.sorted) = 0";
+HAVING (MAX(parts.sorted) = 1 AND MIN(parts.sorted) = 0) OR (MAX(parts.sorted) = 0 AND MIN(parts.sorted) = 0)";
             $result = $conn->query($sql);
             $sql = "SELECT parts.werkorder, info.*
 FROM part_allocation parts, order_info info
@@ -45,7 +45,7 @@ HAVING MAX(parts.sorted) = 1 AND MIN(parts.sorted) = 1";
                             <td id = "order-id"><?php echo $row['werkorder']; ?></td>
                             <td id = "order-license"><?php echo $row['license']; ?></td>
                             <td id = "order-license"><?php echo $row['mechanic']; ?></td>
-                            <td id = "order-rdy" style="padding:4px" ><img width=24px height=24px alt="ready"  src="includes/images/ready.png" /></td>
+                            <td id = "order-rdy" class="col-sm-1" style="padding:4px" ><img width=24px height=24px alt="ready"  src="includes/images/ready.png" /></td>
                         </tr>
                         <?php
                     endwhile;

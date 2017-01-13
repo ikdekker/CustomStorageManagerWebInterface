@@ -5,8 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-$orderId = $_POST['label_id'];
-$productId = $_POST['product_id'];
+$orderId = $_POST['order_id'];
 
 $servername = "127.0.0.1";
 $username = "root";
@@ -14,7 +13,5 @@ $password = "digo_secret";
 $dbname = "digo_parts_db";
 
 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-$stmt = $conn->prepare('Update system_status set working=:lstr where placeholder=0');
-$stmt->execute(['lstr' => $orderId]);
-$stmt = $conn->prepare('Update part_allocation set big=1 where werkorder=:lstr');
-$stmt->execute(['lstr' => $orderId]);
+$stmt = $conn->prepare('Update order_indexing set `index`=-1 where werkorder=:lstr');
+$exe = $stmt->execute(['lstr' => $orderId]);
