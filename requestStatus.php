@@ -13,7 +13,8 @@ if ($conn->connect_error) {
 
 $sql = "SELECT orderid FROM system_status";
 $result = $conn->query($sql);
-
+$res = [];
 foreach ($result as $row) {
-  echo $row['orderid'];
+  $res[$row['placeholder']]['orderid'] = [$res['orderid']];
 }
+echo json_encode($row);

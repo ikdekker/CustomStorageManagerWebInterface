@@ -15,6 +15,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="includes/css/bootstrap.min.css" rel="stylesheet">
         <script src="includes/js/jquery.js"></script>
+        <link rel="shortcut icon" href="">
     </head>
     <style>
         * { font-size: 1.1em}
@@ -25,6 +26,13 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
             position:fixed;
             background: white;
             display:none;
+
+        }
+        .digo-overlay {
+            width:100%;
+            height:100%;
+            position:fixed;
+            background: white;
 
         }
         .confirm-dialog {
@@ -94,7 +102,42 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
         }
     </style>
     <body>
+        <?php
+        if (strpos($orderId, "digo") !== false) :
+            $digoOrderId = substr($orderId, 4);
+            ?>
+            <div class="digo-overlay">
+                <div>Werkorder <?php echo $digoOrderId; ?> ingescand. Kenteken: <?php
+$sql = "SELECT license from order_info WHERE `werkorder`=$digoOrderId LIMIT 1";
+$sqlLicense = mysqli_fetch_row($conn->query($sql));
 
+    echo $sqlLicense[0]. "<br>";
+                        $sql = "SELECT werkorder, description, amount
+                    from part_allocation
+            WHERE `werkorder`=$digoOrderId
+            GROUP BY werkorder, description, amount
+            HAVING MAX(sorted) = 1 AND MIN(sorted) = 1 AND MAX(big) = 1";
+                        $resultBig = $conn->query($sql);
+                    if (mysqli_num_rows($resultBig) == 0) :
+                        ?>
+                        Er zijn geen grote onderdelen 
+                        <?php else :
+                        ?>
+                        Grote onderdelen aanwezig:
+                        <br>
+                        <?php
+                        while ($row = $resultBig->fetch_assoc()) {
+                            echo $row["description"] . " aantal: ";
+                            echo $row["amount"];
+                        }
+                    endif;
+                    ?>
+                </div>
+            </div>
+            <?php
+            exit;
+        endif;
+        ?>
         <div class="confirm-overlay">
             <?php
             if ($del && !$allBig) {
@@ -156,19 +199,19 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
             if (!$orderSet) {
                 echo "Scan een werkorder of een pakbon om te beginnen.</br></br>";
             }
-            if (1) {
-                $sql = "SELECT * FROM part_allocation where sorted = 0";
-                $result = $conn->query($sql);
-                if ($del && !$allBig) {
-                    $del = $_GET['deleted'];
 
-                    echo "<form method='post' action='undo.php'>";
-                    echo "<div class='alert alert-info'>";
-                    echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-xs btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
-                    echo "</div>";
-                    echo "</form>";
-                }
+            $sql = "SELECT * FROM part_allocation where sorted = 0";
+            $result = $conn->query($sql);
+            if ($del && !$allBig) {
+                $del = $_GET['deleted'];
+
+                echo "<form method='post' action='undo.php'>";
+                echo "<div class='alert alert-info'>";
+                echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-xs btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
+                echo "</div>";
+                echo "</form>";
             }
+
 
             if ($orderId && $result->num_rows > 0) :
                 ?>
@@ -196,8 +239,8 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                         <td class="col-sm-1" style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint('<?php echo $row['werkorder'] . "','" . $row['product_id']; ?>')" class="btn btn-xs"><img width=36px height=36px alt="sticker printen" src='includes/images/print.png'/></button></td>
                             <!--<td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>-->
                         </tr>
-                    <?php endwhile;
-                    ?>
+    <?php endwhile;
+    ?>
                 </table>
                 <form method="post" action="stop.php"><button type="submit" name="clear" class="btn btn-sm btn-danger">STOP</button>
                     <?php
@@ -226,17 +269,19 @@ echo "var curOrder = " . $jsid . ";"
         $.ajax({
             type: "GET",
             url: "requestStatus.php",
-            dataType: "text",
+            dataType: "json",
             success: function (data) {
-                if (data != 0 && data != curOrder) {
-                    window.location.replace("http://" + location.hostname + "/index.php?orderId=" + data);
+                if (data.orderid != 0 && data.orderid != curOrder) {
+                    window.location.replace("http://" + location.hostname + "/index.php?orderId=" + data.orderid);
                 }
             }
         });
     }
     function labelPrint(id, productId) {
         $('.message').html("Bezig met printen").show();
-        setTimeout(function () {$('.message').html("").hide()}, 8000);
+        setTimeout(function () {
+            $('.message').html("").hide()
+        }, 8000);
         $.ajax({
             type: "POST",
             url: "requestLabel.php",
@@ -247,7 +292,11 @@ echo "var curOrder = " . $jsid . ";"
         $.ajax({
             type: "POST",
             url: "alterIndex.php",
-            data: {"order_id": <?php if(!$orderId) echo 0; echo $orderId ?>}
+            data: {"order_id": <?php
+if (!$orderId)
+    echo 0;
+echo $orderId
+?>}
         }).done(function () {
             window.location.replace('/');
         });
@@ -270,8 +319,12 @@ echo "var curOrder = " . $jsid . ";"
             });
         });
 
-        if (!found) {
-            $('.message').html("De ingescande order is niet gevonden.").show();
+        if (!found && curOrder != 0) {
+            $('.message').html("Alle producten zijn weggelegd. U wordt verwezen naar de homepage over 5 seconden.").show();
+
+            setTimeout(function () {
+                window.location.replace("stop.php");
+            }, 5000);
         } else {
             $('.message').html("").hide();
         }

@@ -16,5 +16,5 @@ $dbname = "digo_parts_db";
 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
 $stmt = $conn->prepare('Update system_status set working=:lstr where placeholder=0');
 $stmt->execute(['lstr' => $orderId]);
-$stmt = $conn->prepare('Update part_allocation set big=1 where werkorder=:lstr');
-$stmt->execute(['lstr' => $orderId]);
+$stmt = $conn->prepare('Update part_allocation set big=1 where product_id=:pid and werkorder=:lstr');
+$stmt->execute(['lstr' => $orderId, 'pid' => $productId]);
