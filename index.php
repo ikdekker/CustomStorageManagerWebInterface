@@ -15,10 +15,16 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="includes/css/bootstrap.min.css" rel="stylesheet">
         <script src="includes/js/jquery.js"></script>
+        <script src="includes/js/bootstrap.min.js"></script>
         <link rel="shortcut icon" href="">
     </head>
     <style>
         * { font-size: 1.1em}
+
+        .identifier { 
+            float:right;
+            font-size:2em;
+        }
 
         .confirm-overlay {
             width:100%;
@@ -33,7 +39,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
             height:100%;
             position:fixed;
             background: white;
-
+            padding: 20px;
         }
         .confirm-dialog {
             /*display: none;*/
@@ -107,154 +113,164 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
             $digoOrderId = substr($orderId, 4);
             ?>
             <div class="digo-overlay">
-                <div>Werkorder <?php echo $digoOrderId; ?> ingescand. Kenteken: <?php
-$sql = "SELECT license from order_info WHERE `werkorder`=$digoOrderId LIMIT 1";
-$sqlLicense = mysqli_fetch_row($conn->query($sql));
+                <div>Werkorder <?php echo $digoOrderId; ?> ingescand. <div class="identifier">Kenteken: <?php
+                        $sql = "SELECT license from order_info WHERE `werkorder`=$digoOrderId LIMIT 1";
+                        $sqlLicense = mysqli_fetch_row($conn->query($sql));
 
-    echo $sqlLicense[0]. "<br>";
+                        echo $sqlLicense[0] . "</div><br>";
                         $sql = "SELECT werkorder, description, amount
                     from part_allocation
             WHERE `werkorder`=$digoOrderId
             GROUP BY werkorder, description, amount
             HAVING MAX(sorted) = 1 AND MIN(sorted) = 1 AND MAX(big) = 1";
                         $resultBig = $conn->query($sql);
-                    if (mysqli_num_rows($resultBig) == 0) :
-                        ?>
-                        Er zijn geen grote onderdelen 
+                        if (mysqli_num_rows($resultBig) == 0) :
+                            ?>
+                            Er zijn geen grote onderdelen 
                         <?php else :
-                        ?>
-                        Grote onderdelen aanwezig:
-                        <br>
+                            ?>
+                            <h3>Grote onderdelen aanwezig:</h3>
+                            <br>
+                            <?php
+                            echo "<table class='table'><tr><th>Naam</th><th>Aantal</th></tr>";
+                            while ($row = $resultBig->fetch_assoc()) {
+                                echo "<tr><td>" . $row["description"] . "</td>";
+                                echo "<td>" . $row["amount"] . "</td></tr>";
+                            }
+                            ?>
+                            </table>
                         <?php
-                        while ($row = $resultBig->fetch_assoc()) {
-                            echo $row["description"] . " aantal: ";
-                            echo $row["amount"];
+                        endif;
+                        ?>
+
+                        <script>
+                            setTimeout(function () {
+                                window.location.replace("/");
+                            }, 30000);
+                        </script>
+                    </div>
+                </div>
+                <?php
+                exit;
+            endif;
+            ?>
+            <div class="confirm-overlay">
+                <?php
+                if ($del && !$allBig) {
+                    $del = $_GET['deleted'];
+
+                    echo "<form method='post' action='undo.php'>";
+                    echo "<div class='alert alert-info' style='width:auto margin:20px'>";
+                    echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-sm btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
+                    echo "</div>";
+                    echo "</form>";
+                }
+                ?>
+                <div class="confirm-dialog">
+                    <div class="dialog-container">
+                        <p>Bak behouden</p>
+                        <ul>
+                            <li><a href="#1" onclick="alterIndex()">Nee</a></li>
+                            <li><a href="#0" onclick="javacript:$('.confirm-overlay').hide()">Ja</a></li>
+                        </ul>
+                    </div> <!-- cd-popup-container -->
+                </div> <!-- cd-popup -->
+            </div> <!-- cd-popup -->
+            <div class="" style="margin:20px"><h3>
+                    <?php
+                    if (!empty($allBig = $_GET['allbig'])) {
+                        if ($allBig) {
+                            ?>
+                            <script>
+                                $('.confirm-overlay').show();
+                            </script>
+                            <?php
+                        }
+                    }
+                    /* This sets the $time variable to the current hour in the 24 hour clock format */
+                    $time = date("H");
+                    /* Set the $timezone variable to become the current timezone */
+                    $timezone = date("e");
+                    /* If the time is less than 1200 hours, show good morning */
+                    if ($time < "12") {
+                        echo "Goedemorgen";
+                    } else
+                    /* If the time is grater than or equal to 1200 hours, but less than 1700 hours, so good afternoon */
+                    if ($time >= "12" && $time < "17") {
+                        echo "Goedemiddag";
+                    } else
+                    /* Should the time be between or equal to 1700 and 1900 hours, show good evening */
+                    if ($time >= "17") {
+                        echo "Goedenavond";
+                    }
+                    ?>
+                </h3>
+                <br>
+                <input class="form-control" style="width:120px;display:inline" id="search" type="hidden"/>
+
+                <div class="message alert alert-success" style="margin:24px;margin-top:0">
+                </div>
+                <?php
+                $orderSet = isset($_GET['orderId']) && !empty($_GET['orderId']);
+                if (!$orderSet) {
+                    echo "Scan een werkorder of een pakbon om te beginnen.</br></br>";
+                }
+
+                $sql = "SELECT * FROM part_allocation where sorted = 0";
+                $result = $conn->query($sql);
+                if ($del && !$allBig) {
+                    $del = $_GET['deleted'];
+
+                    echo "<form method='post' action='undo.php'>";
+                    echo "<div class='alert alert-info'>";
+                    echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-xs btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
+                    echo "</div>";
+                    echo "</form>";
+                }
+
+
+                if ($orderId && $result->num_rows > 0) :
+                    ?>
+                    <table class = "table" id="order-table">
+                        <tr>
+                            <th>order</th>
+                            <th>artikel</th>
+                            <th>product</th>
+                            <th>aantal</th>
+                            <th>klaar</th>
+                            <th>label</th>
+                            <!--<th>afwezig</th>-->
+                        </tr>
+                        <?php
+                        // output data of each row
+                        while ($row = $result->fetch_assoc()) :
+                            ?><tr>
+                            <form method="post" action="clear.php">
+                                <td class="col-sm-1" id = "order-id"><input type="hidden" name="w_order" value="<?php echo $row['werkorder']; ?>"/><?php echo $row['werkorder']; ?></td>
+                                <td id = "product-id"><input type="hidden" name="part_id" value="<?php echo $row['product_id']; ?>"/><?php echo $row['product_id']; ?></td>
+                                <td id = "product-name"><?php echo $row['description']; ?></td>
+                                <td class="col-sm-1" id = "product-amount"><?php echo $row['amount']; ?></td>
+                                <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="clear" class="btn btn-xs"><img width=36px height=36px alt="weggelegd" src='includes/images/check.png'/></button></td>
+                            </form>
+                            <td class="col-sm-1" style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint('<?php echo $row['werkorder'] . "','" . $row['product_id']; ?>')" class="btn btn-xs"><img width=36px height=36px alt="sticker printen" src='includes/images/print.png'/></button></td>
+                                <!--<td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>-->
+                            </tr>
+                        <?php endwhile;
+                        ?>
+                    </table>
+                    <form method="post" action="stop.php"><button type="submit" name="clear" class="btn btn-sm btn-danger">STOP</button>
+                        <?php
+                    else :
+                        if ($orderSet) {
+                            echo "Geen producten gevonden<br><br>";
+                        } else {
+                            echo "Dit is de productpagina.</br>";
+
+                            echo "Producten zullen hier verschijnen wanneer een order wordt ingescand.</br></br>";
                         }
                     endif;
                     ?>
-                </div>
             </div>
-            <?php
-            exit;
-        endif;
-        ?>
-        <div class="confirm-overlay">
-            <?php
-            if ($del && !$allBig) {
-                $del = $_GET['deleted'];
-
-                echo "<form method='post' action='undo.php'>";
-                echo "<div class='alert alert-info' style='width:auto margin:20px'>";
-                echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-sm btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
-                echo "</div>";
-                echo "</form>";
-            }
-            ?>
-            <div class="confirm-dialog">
-                <div class="dialog-container">
-                    <p>Bak behouden</p>
-                    <ul>
-                        <li><a href="#1" onclick="alterIndex()">Nee</a></li>
-                        <li><a href="#0" onclick="javacript:$('.confirm-overlay').hide()">Ja</a></li>
-                    </ul>
-                </div> <!-- cd-popup-container -->
-            </div> <!-- cd-popup -->
-        </div> <!-- cd-popup -->
-        <div class="" style="margin:20px"><h3>
-                <?php
-                if (!empty($allBig = $_GET['allbig'])) {
-                    if ($allBig) {
-                        ?>
-                        <script>
-                            $('.confirm-overlay').show();
-                        </script>
-                        <?php
-                    }
-                }
-                /* This sets the $time variable to the current hour in the 24 hour clock format */
-                $time = date("H");
-                /* Set the $timezone variable to become the current timezone */
-                $timezone = date("e");
-                /* If the time is less than 1200 hours, show good morning */
-                if ($time < "12") {
-                    echo "Goedemorgen";
-                } else
-                /* If the time is grater than or equal to 1200 hours, but less than 1700 hours, so good afternoon */
-                if ($time >= "12" && $time < "17") {
-                    echo "Goedemiddag";
-                } else
-                /* Should the time be between or equal to 1700 and 1900 hours, show good evening */
-                if ($time >= "17") {
-                    echo "Goedenavond";
-                }
-                ?>
-            </h3>
-            <br>
-            <input class="form-control" style="width:120px;display:inline" id="search" type="hidden"/>
-
-            <div class="message alert alert-success" style="margin:24px;margin-top:0">
-            </div>
-            <?php
-            $orderSet = isset($_GET['orderId']) && !empty($_GET['orderId']);
-            if (!$orderSet) {
-                echo "Scan een werkorder of een pakbon om te beginnen.</br></br>";
-            }
-
-            $sql = "SELECT * FROM part_allocation where sorted = 0";
-            $result = $conn->query($sql);
-            if ($del && !$allBig) {
-                $del = $_GET['deleted'];
-
-                echo "<form method='post' action='undo.php'>";
-                echo "<div class='alert alert-info'>";
-                echo "order: $orderId product $del weggelegd<button type='submit' class='btn btn-xs btn-primary' style='margin:0;float:right'>Ongedaan maken</button><input type='hidden' name='del' value='" . $del . "'><input type='hidden' name='w_order' value='" . $orderId . "'>";
-                echo "</div>";
-                echo "</form>";
-            }
-
-
-            if ($orderId && $result->num_rows > 0) :
-                ?>
-                <table class = "table" id="order-table">
-                    <tr>
-                        <th>order</th>
-                        <th>artikel</th>
-                        <th>product</th>
-                        <th>aantal</th>
-                        <th>klaar</th>
-                        <th>label</th>
-                        <!--<th>afwezig</th>-->
-                    </tr>
-                    <?php
-                    // output data of each row
-                    while ($row = $result->fetch_assoc()) :
-                        ?><tr>
-                        <form method="post" action="clear.php">
-                            <td class="col-sm-1" id = "order-id"><input type="hidden" name="w_order" value="<?php echo $row['werkorder']; ?>"/><?php echo $row['werkorder']; ?></td>
-                            <td id = "product-id"><input type="hidden" name="part_id" value="<?php echo $row['product_id']; ?>"/><?php echo $row['product_id']; ?></td>
-                            <td id = "product-name"><?php echo $row['description']; ?></td>
-                            <td class="col-sm-1" id = "product-amount"><?php echo $row['amount']; ?></td>
-                            <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="clear" class="btn btn-xs"><img width=36px height=36px alt="weggelegd" src='includes/images/check.png'/></button></td>
-                        </form>
-                        <td class="col-sm-1" style="padding:4px" id="product-amount"><button type="submit" onclick="labelPrint('<?php echo $row['werkorder'] . "','" . $row['product_id']; ?>')" class="btn btn-xs"><img width=36px height=36px alt="sticker printen" src='includes/images/print.png'/></button></td>
-                            <!--<td style="padding:4px" id="product-amount"><button type="submit" class="btn btn-xs"><img width=24px height=24px alt="niet aanwezig" src='includes/images/missing.png'/></button></td>-->
-                        </tr>
-    <?php endwhile;
-    ?>
-                </table>
-                <form method="post" action="stop.php"><button type="submit" name="clear" class="btn btn-sm btn-danger">STOP</button>
-                    <?php
-                else :
-                    if ($orderSet) {
-                        echo "Geen producten gevonden<br><br>";
-                    } else {
-                        echo "Dit is de productpagina.</br>";
-
-                        echo "Producten zullen hier verschijnen wanneer een order wordt ingescand.</br></br>";
-                    }
-                endif;
-                ?>
-        </div>
     </body>
 </html>
 <script>
@@ -330,4 +346,3 @@ echo $orderId
         }
     }
 </script>
-<script src="includes/js/bootstrap.min.js"></script>
