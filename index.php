@@ -122,7 +122,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                     from part_allocation
             WHERE `werkorder`=$digoOrderId
             GROUP BY werkorder, description, amount
-            HAVING MAX(sorted) = 1 AND MIN(sorted) = 1 AND MAX(big) = 1";
+            HAVING MAX(sorted) = 1 AND MAX(big) = 1";
                         $resultBig = $conn->query($sql);
                         if (mysqli_num_rows($resultBig) == 0) :
                             ?>
