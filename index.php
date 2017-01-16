@@ -120,9 +120,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                         echo $sqlLicense[0] . "</div><br>";
                         $sql = "SELECT werkorder, description, amount
                     from part_allocation
-            WHERE `werkorder`=$digoOrderId
-            GROUP BY werkorder, description, amount
-            HAVING MAX(sorted) = 1 AND MAX(big) = 1";
+            WHERE `werkorder`=$digoOrderId and big=1 and sorted=1";
                         $resultBig = $conn->query($sql);
                         if (mysqli_num_rows($resultBig) == 0) :
                             ?>
