@@ -142,6 +142,21 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                         ?>
 
                         <script>
+	    function checkDBChanges() {
+    $.ajax({
+            type: "GET",
+            url: "requestStatus.php",
+            dataType: "json",
+            success: function (data) {
+                if (data.orderid != 0 && data.orderid != curOrder) {
+                    window.location.replace("http://" + location.hostname + "/index.php?orderId=" + data.orderid);
+                }
+            }
+        });
+    }
+
+    setInterval(checkDBChanges, 5000);
+
                             setTimeout(function () {
                                 window.location.replace("/");
                             }, 30000);
@@ -211,7 +226,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                 <?php
                 $orderSet = isset($_GET['orderId']) && !empty($_GET['orderId']);
                 if (!$orderSet) {
-                    echo "Scan een werkorder of een pakbon om te beginnen.</br></br>";
+                    echo "<h1>Scan een werkorder of een pakbon om te beginnen.</h1></br></br>";
                 }
 
                 $sql = "SELECT * FROM part_allocation where sorted = 0";
@@ -262,9 +277,9 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                         if ($orderSet) {
                             echo "Geen producten gevonden<br><br>";
                         } else {
-                            echo "Dit is de productpagina.</br>";
+                            //echo "Dit is de productpagina.</br>";
 
-                            echo "Producten zullen hier verschijnen wanneer een order wordt ingescand.</br></br>";
+                            //echo "Producten zullen hier verschijnen wanneer een order wordt ingescand.</br></br>";
                         }
                     endif;
                     ?>
