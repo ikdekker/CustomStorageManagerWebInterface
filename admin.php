@@ -11,12 +11,6 @@ if ($conn->connect_error) {
         <script src="includes/js/bootstrap.min.js"></script>
     </head>
     <div id="content">
-    <script>
-        pass = prompt("password:");
-        if (pass != "abc123") {
-            $("#content").hide();
-        }
-    </script>
         <?php
         $sql = "SELECT o.*, i.license FROM order_indexing o inner join order_info i on i.werkorder = o.werkorder where o.werkorder >=  0";
         $result = $conn->query($sql);
