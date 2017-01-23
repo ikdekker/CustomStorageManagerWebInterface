@@ -27,7 +27,7 @@ if ($conn->connect_error) {
                 <tr>
                     <th>orderid</th>
                     <th>kenteken</th>
-                    <th>delete</th>
+                    <th>delete</th> 
                 </tr>
                 <?php
                 // output data of each row
@@ -36,7 +36,7 @@ if ($conn->connect_error) {
                     <form method="post" action="delete.php">
                         <td class="col-sm-1" id = "order-id"><input type="hidden" name="w_order" value="<?php echo $row['werkorder']; ?>"/><?php echo $row['werkorder']; ?></td>
                         <td class="col-sm-1" id = "license"><?php echo $row['license']; ?></td>
-                        <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="delete" class="btn btn-xs"><img width=36px height=36px alt="weggelegd" src='includes/images/check.png'/></button></td>
+                        <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="delete" class="btn btn-xs"><img width=36px height=36px alt="weggelegd" src='includes/images/bin.png'/></button></td>
                     </form>
                 <?php endwhile;
                 ?>
