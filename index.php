@@ -181,7 +181,7 @@ $del = isset($_GET['deleted']) && !empty($_GET['deleted']);
                 ?>
                 <div class="confirm-dialog">
                     <div class="dialog-container">
-                        <p>Bak behouden</p>
+                        <p>Wilt u de bak behouden?</p>
                         <ul>
                             <li><a href="#1" onclick="alterIndex()">Nee</a></li>
                             <li><a href="#0" onclick="javacript:$('.confirm-overlay').hide()">Ja</a></li>

@@ -67,7 +67,7 @@ if ($conn->connect_error) {
                     // output data of each row
                     while ($row = $result->fetch_assoc()) :
                         ?><tr>
-                        <form onsubmit="return validate(this)" id="form-<?php echo $row['werkorder'] ?>" method="post" action="delete.php">
+                        <form onsubmit="return validate(this)" data-w-id="<?php echo $row['werkorder'] ?>" data-license="<?php echo $row['license'] ?>" method="post" action="delete.php">
                             <td class="col-sm-1" id = "order-id"><input type="hidden" name="w_order" value="<?php echo $row['werkorder']; ?>"/><?php echo $row['werkorder']; ?></td>
                             <td class="col-sm-1" id = "license"><?php echo $row['license']; ?></td>
                             <td class="col-sm-1" style="padding:4px" id = "product-clear"><button type="submit" name="delete" class="btn btn-xs"><img width=24px height=24px alt="weggelegd" src='includes/images/bin.png'/></button></td>
@@ -229,9 +229,8 @@ if ($conn->connect_error) {
         });
     }
     function validate(form) {
-        console.log($(form.id));
-        orderid = $(form.id).find("#order-id").html();
-        kenteken = $(form.id).find("#license").html();
-        return confirm('Order: ' + orderid + 'met kenteken ' + kenteken + '?');
+        orderid = $(form).attr("data-w-id");
+        kenteken = $(form).attr("data-license");
+        return confirm('Order: ' + orderid + ' met kenteken ' + kenteken + ' verwijderen?');
     }
 </script>
