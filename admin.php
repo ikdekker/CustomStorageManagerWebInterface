@@ -159,9 +159,9 @@ if ($conn->connect_error) {
 </html>
 
 <script>
-//    pass = prompt("Voer het password in:");
-pass='digo21';
-    if (pass == 'digo21') {
+    pass = prompt("Voer het password in:");
+//pass='digo21';
+    if (pass == 'abc123') {
         $("html").show();
         $("#delete-content").show();
     } else {
